@@ -66,10 +66,11 @@ La nave activa siempre tiene física (comportamiento normal de KSP).
 
 | Condición de la nave inactiva | Decisión |
 |---|---|
-| `LANDED`/`SPLASHED`/`PRELAUNCH` | Lo que haga KSP normalmente (raíles si está quieta) |
 | Presión dinámica `q` actual **o prevista en los próximos 15 s** ≥ 100 Pa | Física |
+| Presión estática ≥ 1,0 kPa (umbral al que KSP destruye naves sobre raíles; cubre p. ej. el descenso con paracaídas, donde `q` es bajo) | Física |
 | Algún motor de la nave encendido con empuje > 0 | Física |
-| `q` < 50 Pa durante al menos 5 s y sin motores encendidos | Raíles |
+| `LANDED`/`SPLASHED` y velocidad de superficie ≥ 0,5 m/s (todavía asentándose) | Física |
+| Estaba en física y `q` < 50 Pa durante al menos 5 s, sin ninguna de las condiciones anteriores | Raíles |
 | En cualquier otro caso | Mantener el estado actual (histéresis) |
 
 `q = ½ · ρ · v²`, con `ρ` la densidad atmosférica en la posición de la nave y `v` la velocidad respecto a la superficie. Se calcula igual estando en raíles, a partir de la órbita. Usar `q` en vez de una altitud fija hace que la física se active antes si la nave entra rápida.
@@ -78,20 +79,24 @@ La nave activa siempre tiene física (comportamiento normal de KSP).
 
 **Aplicación.** La decisión se aplica mediante los rangos que KSP ya trae por nave (`Vessel.vesselRanges`, para cada situación: `load`, `unload`, `pack`, `unpack`):
 
-- Para toda nave seguida: `load`/`unload` muy grandes (p. ej. 2.500 km / 2.600 km) → nunca se descarga.
-- Física: `pack`/`unpack` > distancia actual.
-- Raíles: `pack`/`unpack` < distancia actual.
+- Para toda nave seguida: `load` = 2.500 km, `unload` = 2.600 km → nunca se descarga.
+- Física: `pack` = 2.550 km, `unpack` = 2.400 km (siempre mayores que la distancia, que nunca supera `MaxPhysicsDistance` en este modo).
+- Raíles: `pack` = 2.500 m, `unpack` = 2.000 m (`RailsMinDistance`). Por debajo de 2,5 km la nave conserva la física como en KSP normal, para no perder el empuje de la separación ni empaquetar una nave pegada a la activa.
 
-Se respeta siempre `unpack < pack` y `load < unload`. Al dejar de seguir una nave se restauran sus rangos originales.
+Los mismos valores se escriben en las 7 situaciones de `vesselRanges`, porque KSP evalúa `pack` con `BestSituation` y `unpack` con `situation` (en `OrbitPhysicsManager`), y `load`/`unload` en `Vessel.Update`. Se reaplican en cada actualización física por si KSP los reinicia. Al dejar de seguir una nave se restauran sus rangos originales.
 
 ### 3.3 Protección contra borrado
 
-KSP destruye naves que considera en una situación imposible: naves sobre raíles dentro de la atmósfera por debajo de cierta presión/altitud, y naves que atraviesan el terreno al cargarse. El mod debe impedir el primer caso para las naves seguidas. Los métodos exactos de KSP que lo hacen se localizarán en el prototipo (descompilando `Assembly-CSharp.dll`) y se parchearán con Harmony solo para naves seguidas.
+Verificado descompilando KSP 1.12.5: `Vessel.CheckKill()` destruye una nave si está empaquetada, no es la activa, `FlightGlobals.overrideOrbit` es `false`, no está `LANDED`/`SPLASHED`, `mainBody.GetPressure(altitude) > 1.0` kPa y está más lejos de la activa que su `pack`. La misma función destruye también naves que atraviesan el terreno; esa parte **no** se toca.
+
+Con la política de 3.2 una nave seguida solo puede estar sobre raíles a más de 1 kPa en el caso `FUERA DE RANGO`. Para ese caso, `KillGuard` es un parche Harmony sobre `Vessel.CheckKill`: un *prefix* que, solo para naves seguidas, pone `FlightGlobals.overrideOrbit = true` y guarda el valor anterior, y un *finalizer* que lo restaura. Así se salta únicamente la rama de la presión y se conserva la del terreno.
+
+Las naves seguidas nunca se descargan, así que las reglas de KSP para naves descargadas no les afectan mientras se esté en la escena de vuelo.
 
 ### 3.4 Cambio de nave
 
 - Tecla configurable (por defecto **`Alt + B`**; el prototipo comprueba que no choca con otras teclas de KSP o de los mods instalados) y clic en la ventanita → `FlightGlobals.ForceSetActiveVessel` a la otra nave seguida.
-- Como la nave está cargada, no hay pantalla de carga. Si estaba en raíles, KSP la desempaqueta al hacerse activa.
+- Verificado en el código: `ForceSetActiveVessel` a una nave **cargada** no recarga la escena (solo guarda y recarga si `!v.loaded`), y con `force` se salta la prohibición de cambiar de nave en la atmósfera. Si estaba en raíles, KSP la desempaqueta al hacerse activa.
 - Si la otra nave no está cargada por algún motivo (p. ej. tras cambiar de escena), el cambio funciona igual pero con la carga normal de KSP; no es un error.
 
 ### 3.5 Ventanita (monitor)
@@ -123,15 +128,16 @@ Archivo `GameData/ReusabilityLink/Settings.cfg`:
 - `MaxTrackedVessels` (2)
 - `AutoTrack` (true), `AutoTrackRequireEngines` (true)
 - `PhysicsOnDynamicPressure` (100 Pa), `RailsBelowDynamicPressure` (50 Pa), `RailsHoldSeconds` (5), `LookaheadSeconds` (15)
-- `MaxPhysicsDistance` (300000 m)
+- `MaxPhysicsDistance` (300000 m), `RailsMinDistance` (2500 m), `RailsMaxStaticPressureKPa` (1.0)
+- `LandedSettleSpeed` (0,5 m/s), `LandedSettleSeconds` (10)
 - `SwitchKey`
 - `ImpactWarnSeconds` (60), `ImpactCriticalSeconds` (20)
-- Posición y visibilidad de la ventana (se guardan solas)
+- Posición y visibilidad de la ventana: se guardan solas en `GameData/ReusabilityLink/PluginData/Window.cfg` (Module Manager ignora `PluginData`, así que no invalida su caché).
 
 ### 3.7 Casos límite
 
 - **Warp sobre raíles:** KSP empaqueta todo. Si una nave seguida necesita física según la política, el mod limita el warp a warp físico y muestra un aviso.
-- **Salir de la escena de vuelo** (Centro Espacial, Estación de Seguimiento): las naves se descargan como siempre. Si una nave seguida está en la atmósfera, se avisa antes de salir. La marca "seguida" persiste y al volver al vuelo se reanuda el comportamiento.
+- **Salir de la escena de vuelo** (Centro Espacial, Estación de Seguimiento): las naves se descargan como siempre. Mientras una nave seguida inactiva esté en la atmósfera y no aterrizada, la ventanita muestra de forma permanente "No salgas del vuelo: el booster puede perderse", de modo que el aviso está visible antes de salir. La marca "seguida" persiste y al volver al vuelo se reanuda el comportamiento.
 - **Nave inactiva toca suelo/agua con física y lejos:** el terreno puede no estar construido alrededor de ella. Mitigación v1: los avisos de impacto. Si en el prototipo resulta que atraviesa el suelo, se documenta como limitación conocida y se valora una solución en v2.
 - **Nave destruida o fusionada (acoplamiento):** se deja de seguir sin error.
 
@@ -144,7 +150,7 @@ C:\proj4\
   ReusabilityLink.sln
   Directory.Build.props            ← ruta a KSP (KSPDir), compartida
   src/
-    ReusabilityLink.Core/          ← netstandard2.0, sin referencias a KSP/Unity
+    ReusabilityLink.Core/          ← net472, sin referencias a KSP/Unity (KSP no trae netstandard.dll)
     ReusabilityLink/               ← net472, referencia KSP, Unity, Harmony y Core
   tests/
     ReusabilityLink.Core.Tests/    ← xUnit, prueba Core
