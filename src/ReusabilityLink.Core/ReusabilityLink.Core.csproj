@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>ReusabilityLink.Core</AssemblyName>
+    <RootNamespace>ReusabilityLink.Core</RootNamespace>
+  </PropertyGroup>
+</Project>
