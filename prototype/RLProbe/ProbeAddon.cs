@@ -41,7 +41,7 @@ namespace RLProbe
         {
             bool alt = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
             if (alt && Input.GetKeyDown(KeyCode.P)) visible = !visible;
-            if (alt && Input.GetKeyDown(KeyCode.B)) ScreenMessages.PostScreenMessage("[RLProbe] Alt+B detectado", 2f);
+            if (alt && Input.GetKeyDown(KeyCode.Y)) ScreenMessages.PostScreenMessage("[RLProbe] Alt+Y detectado", 2f);
 
             if (pendingSwitch != null)
             {

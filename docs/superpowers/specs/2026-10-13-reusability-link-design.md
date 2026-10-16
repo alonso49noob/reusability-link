@@ -95,7 +95,7 @@ Las naves seguidas nunca se descargan, así que las reglas de KSP para naves des
 
 ### 3.4 Cambio de nave
 
-- Tecla configurable (por defecto **`Alt + B`**; el prototipo comprueba que no choca con otras teclas de KSP o de los mods instalados) y clic en la ventanita → `FlightGlobals.ForceSetActiveVessel` a la otra nave seguida.
+- Tecla configurable (por defecto **`Alt + Y`**: las teclas propias de KSP ignoran los modificadores, así que `Alt + B` también activaba los frenos; al arrancar, el mod avisa si `SwitchKey` coincide con alguna tecla de KSP) y clic en la ventanita → `FlightGlobals.ForceSetActiveVessel` a la otra nave seguida.
 - Verificado en el código: `ForceSetActiveVessel` a una nave **cargada** no recarga la escena (solo guarda y recarga si `!v.loaded`), y con `force` se salta la prohibición de cambiar de nave en la atmósfera. Si estaba en raíles, KSP la desempaqueta al hacerse activa.
 - Si la otra nave no está cargada por algún motivo (p. ej. tras cambiar de escena), el cambio funciona igual pero con la carga normal de KSP; no es un error.
 
@@ -213,7 +213,7 @@ El prototipo vive en una rama/carpeta aparte y no se reutiliza como código del 
 
 ### 5.1 Resultados
 
-Pendiente: la sesión de medición del usuario (`prototype/README.md`) aún no se ha hecho. Hasta entonces `MaxPhysicsDistance` (300 km) y `SwitchKey` (`Alt+B`) se quedan en los valores iniciales, y las limitaciones de suelo lejano y SAS en nave inactiva están sin confirmar.
+Pendiente: la sesión de medición del usuario (`prototype/README.md`) aún no se ha hecho. Hasta entonces `MaxPhysicsDistance` (300 km) y `SwitchKey` (`Alt+Y`) se quedan en los valores iniciales, y las limitaciones de suelo lejano y SAS en nave inactiva están sin confirmar.
 
 ## 6. Pruebas
 

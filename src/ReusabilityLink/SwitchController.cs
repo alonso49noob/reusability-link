@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using ReusabilityLink.Core;
 using UnityEngine;
 
@@ -23,6 +25,24 @@ namespace ReusabilityLink
             {
                 Log.Warn($"SwitchKey '{chord}': tecla desconocida, el atajo queda desactivado");
             }
+            WarnStockConflicts();
+        }
+
+        /// <summary>KSP's own key bindings ignore modifiers, so Alt+B would also toggle BRAKES.</summary>
+        void WarnStockConflicts()
+        {
+            var bindings = new List<KeyValuePair<string, string>>();
+            foreach (var field in typeof(GameSettings).GetFields(BindingFlags.Public | BindingFlags.Static))
+            {
+                if (!(field.GetValue(null) is KeyBinding binding)) continue;
+                if (binding.primary != null) bindings.Add(new KeyValuePair<string, string>(field.Name, binding.primary.code.ToString()));
+                if (binding.secondary != null) bindings.Add(new KeyValuePair<string, string>(field.Name, binding.secondary.code.ToString()));
+            }
+            var conflicts = KeyConflicts.Find(chord, bindings);
+            if (conflicts.Count == 0) return;
+            string names = string.Join(", ", conflicts.ToArray());
+            Log.Warn($"SwitchKey '{chord}' coincide con teclas de KSP ({names}); también se activarán al cambiar de nave");
+            ScreenMessages.PostScreenMessage($"Reusability Link: {chord} también activa {names} en KSP. Cambia SwitchKey en Settings.cfg", 8f);
         }
 
         public void Update()

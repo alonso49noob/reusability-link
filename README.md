@@ -6,7 +6,7 @@ Al separar un booster durante el ascenso, Reusability Link:
 
 - **lo mantiene cargado** aunque se aleje: KSP no lo descarga ni lo borra por estar en la atmósfera;
 - le da **física completa solo cuando la necesita** (aire denso, motores encendidos, aterrizando) y lo lleva **sobre raíles** en el vacío, sin coste de rendimiento;
-- te deja **cambiar entre la etapa superior y el booster al instante**, sin pantalla de carga (`Alt+B`);
+- te deja **cambiar entre la etapa superior y el booster al instante**, sin pantalla de carga (`Alt+Y`);
 - muestra la otra nave en una **ventanita** con velocidad, altitud, altura sobre el suelo, velocidad vertical, una **navball simplificada**, su estado y avisos ("entrando en aire denso", "impacto en < 20 s", "fuera de rango de física").
 
 ## Requisitos
@@ -30,7 +30,7 @@ La compilación copia el mod a la instalación de KSP indicada en `Directory.Bui
 
 1. Construye el booster con un **núcleo de control** (sonda o cabina) y **motores**.
 2. Al separarlo durante el ascenso aparece "Reusability Link: siguiendo …". Cofias, adaptadores y satélites desplegados en órbita estable **no** se siguen.
-3. Sigue pilotando la etapa superior. La ventanita muestra el booster. Cuando avise de aire denso o del encendido de reentrada, pulsa `Alt+B` o el botón **Cambiar**.
+3. Sigue pilotando la etapa superior. La ventanita muestra el booster. Cuando avise de aire denso o del encendido de reentrada, pulsa `Alt+Y` o el botón **Cambiar**.
 4. Aterriza el booster. Cuando lleva 10 s quieto en tierra o agua, deja de seguirse y queda como una nave normal.
 
 El botón de la barra de aplicaciones muestra u oculta la ventana. Abriéndola desde ahí también puedes **seguir o dejar de seguir la nave activa a mano**, sin filtro. Como máximo se siguen 2 naves a la vez (configurable).
@@ -43,7 +43,7 @@ No salgas de la escena de vuelo mientras el booster está en la atmósfera: fuer
 
 | Clave | Por defecto | Qué hace |
 |---|---|---|
-| `SwitchKey` | `Alt+B` | Tecla para cambiar de nave |
+| `SwitchKey` | `Alt+Y` | Tecla para cambiar de nave |
 | `MaxPhysicsDistance` | `300000` | Distancia (m) máxima para mantener la física de la nave inactiva |
 | `PhysicsOnDynamicPressure` | `100` | Presión dinámica (Pa) que activa la física |
 | `RailsMaxStaticPressureKPa` | `1.0` | Por encima de esta presión la nave inactiva nunca va sobre raíles |

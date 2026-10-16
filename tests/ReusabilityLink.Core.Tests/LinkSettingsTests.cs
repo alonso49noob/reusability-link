@@ -24,7 +24,7 @@ namespace ReusabilityLink.Core.Tests
             Assert.Equal(10, s.LandedSettleSeconds);
             Assert.Equal(60, s.ImpactWarnSeconds);
             Assert.Equal(20, s.ImpactCriticalSeconds);
-            Assert.Equal("Alt+B", s.SwitchKey.ToString());
+            Assert.Equal("Alt+Y", s.SwitchKey.ToString());
         }
 
         [Fact]
@@ -74,7 +74,7 @@ namespace ReusabilityLink.Core.Tests
         {
             var w = new List<string>();
             var s = LinkSettings.FromValues(new Dictionary<string, string> { ["SwitchKey"] = "Alt+" }, w);
-            Assert.Equal("Alt+B", s.SwitchKey.ToString());
+            Assert.Equal("Alt+Y", s.SwitchKey.ToString());
             Assert.Single(w);
         }
 

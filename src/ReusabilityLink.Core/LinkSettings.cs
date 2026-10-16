@@ -30,7 +30,7 @@ namespace ReusabilityLink.Core
 
         static KeyChord DefaultSwitchKey()
         {
-            KeyChord.TryParse("Alt+B", out var chord);
+            KeyChord.TryParse("Alt+Y", out var chord);
             return chord;
         }
 
