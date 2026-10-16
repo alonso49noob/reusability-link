@@ -211,6 +211,10 @@ Antes de construir el mod completo, un prototipo desechable (DLL mínima + boton
 
 El prototipo vive en una rama/carpeta aparte y no se reutiliza como código del mod. Sus resultados se anotan en este documento antes de seguir.
 
+### 5.1 Resultados
+
+Pendiente: la sesión de medición del usuario (`prototype/README.md`) aún no se ha hecho. Hasta entonces `MaxPhysicsDistance` (300 km) y `SwitchKey` (`Alt+B`) se quedan en los valores iniciales, y las limitaciones de suelo lejano y SAS en nave inactiva están sin confirmar.
+
 ## 6. Pruebas
 
 - **Automáticas (Core):** `PhysicsPolicy` (umbrales, histéresis, previsión, fuera de rango), `AutoTrackFilter` (cada una de las 4 condiciones, límite de naves), `TelemetryMath` (presión dinámica, tiempo a impacto, ángulos de navball en casos conocidos).
