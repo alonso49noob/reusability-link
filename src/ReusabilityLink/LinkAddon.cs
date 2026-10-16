@@ -16,6 +16,7 @@ namespace ReusabilityLink
         public TrackingService Tracking { get; private set; }
         public RangeController Ranges { get; private set; }
         public SwitchController Switcher { get; private set; }
+        public MonitorWindow Monitor { get; private set; }
 
         Harmony harmony;
         WarpGuard warpGuard;
@@ -34,12 +35,18 @@ namespace ReusabilityLink
             Ranges = new RangeController(Settings, Tracking);
             warpGuard = new WarpGuard(Tracking, Ranges);
             Switcher = new SwitchController(Settings, Tracking);
+            Monitor = new MonitorWindow(Settings, Tracking, Ranges, Switcher);
             Log.Info($"v1 cargado: MaxPhysicsDistance={Settings.MaxPhysicsDistance} SwitchKey={Settings.SwitchKey}");
         }
 
         void Update()
         {
             Switcher?.Update();
+        }
+
+        void OnGUI()
+        {
+            Monitor?.Draw();
         }
 
         void FixedUpdate()
@@ -53,6 +60,7 @@ namespace ReusabilityLink
 
         void OnDestroy()
         {
+            Monitor?.Dispose();
             Tracking?.Dispose();
             harmony?.UnpatchAll(HarmonyId);
             if (Instance == this) Instance = null;
