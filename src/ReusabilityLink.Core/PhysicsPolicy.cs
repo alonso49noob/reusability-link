@@ -34,6 +34,20 @@ namespace ReusabilityLink.Core
     /// <summary>Decides physics vs rails for an inactive tracked vessel (spec §3.2).</summary>
     public static class PhysicsPolicy
     {
+        const double MinPredictionStep = 5;
+        const int MaxPredictionSamples = 20;
+
+        /// <summary>
+        /// Game seconds to look ahead: LookaheadSeconds plus two physics frames, so that under rails
+        /// warp a vessel cannot jump from vacuum into dense air between two decisions.
+        /// </summary>
+        public static double LookaheadHorizon(LinkSettings s, double gameSecondsPerTick) =>
+            s.LookaheadSeconds + 2 * gameSecondsPerTick;
+
+        /// <summary>Sampling step along the predicted path, keeping at most MaxPredictionSamples samples.</summary>
+        public static double PredictionStep(double horizonSeconds) =>
+            System.Math.Max(MinPredictionStep, horizonSeconds / MaxPredictionSamples);
+
         public static LinkMode Step(PolicyState state, PolicyInput input, double dt, LinkSettings s)
         {
             bool forced = input.DynamicPressurePa >= s.PhysicsOnDynamicPressure

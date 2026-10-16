@@ -119,5 +119,27 @@ namespace ReusabilityLink.Core.Tests
             PhysicsPolicy.Step(state, In(q: 150, distance: 400000), 1, S);
             Assert.Equal(0, state.CalmSeconds);
         }
+        [Fact]
+        public void LookaheadHorizon_NoWarp_IsLookaheadPlusTwoFrames()
+        {
+            Assert.Equal(15.04, PhysicsPolicy.LookaheadHorizon(S, 0.02), 6);
+        }
+
+        [Fact]
+        public void LookaheadHorizon_HighWarp_CoversTwoWarpFrames()
+        {
+            // At 1000x rails warp one physics frame advances 20 s of game time.
+            Assert.Equal(55, PhysicsPolicy.LookaheadHorizon(S, 20), 6);
+        }
+
+        [Theory]
+        [InlineData(15.04, 5.0)]
+        [InlineData(55.0, 5.0)]
+        [InlineData(4015.0, 200.75)]
+        public void PredictionStep_KeepsSampleCountBounded(double horizon, double expected)
+        {
+            Assert.Equal(expected, PhysicsPolicy.PredictionStep(horizon), 6);
+        }
     }
 }
+

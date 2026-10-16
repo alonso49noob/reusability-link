@@ -14,6 +14,8 @@ namespace ReusabilityLink
         readonly LinkSettings settings;
         readonly TrackingService tracking;
         readonly Dictionary<Guid, PolicyState> states = new Dictionary<Guid, PolicyState>();
+        double lastUT = double.NaN;
+        double lookaheadSeconds;
 
         /// <summary>Fired with (vessel, previous mode, new mode).</summary>
         public event Action<Vessel, LinkMode, LinkMode> ModeChanged;
@@ -31,6 +33,12 @@ namespace ReusabilityLink
         {
             var active = FlightGlobals.ActiveVessel;
             if (active == null) return;
+
+            // Game time per tick is measured, not derived: it covers physics and rails warp alike.
+            double ut = Planetarium.GetUniversalTime();
+            double gameSecondsPerTick = double.IsNaN(lastUT) ? dt : Math.Max(0, ut - lastUT);
+            lastUT = ut;
+            lookaheadSeconds = PhysicsPolicy.LookaheadHorizon(settings, gameSecondsPerTick);
 
             var live = new HashSet<Guid>();
             foreach (var v in tracking.Tracked)
@@ -69,7 +77,7 @@ namespace ReusabilityLink
             return new PolicyInput
             {
                 DynamicPressurePa = AtmosphereSampler.CurrentQ(v),
-                PredictedDynamicPressurePa = AtmosphereSampler.PredictedMaxQ(v, settings.LookaheadSeconds),
+                PredictedDynamicPressurePa = AtmosphereSampler.PredictedMaxQ(v, lookaheadSeconds),
                 StaticPressureKPa = AtmosphereSampler.StaticPressureKPa(v.mainBody, v.altitude),
                 EngineThrusting = KspAdapters.EngineThrusting(v),
                 LandedOrSplashed = v.LandedOrSplashed,

@@ -9,8 +9,6 @@ namespace ReusabilityLink
     /// </summary>
     internal static class AtmosphereSampler
     {
-        const double PredictionStepSeconds = 5;
-
         public static double StaticPressureKPa(CelestialBody b, double alt) =>
             b.atmosphere && alt < b.atmosphereDepth ? b.GetPressure(Math.Max(alt, 0)) : 0;
 
@@ -27,12 +25,13 @@ namespace ReusabilityLink
         /// <summary>Highest q along the drag-free orbit over the next <paramref name="seconds"/>.</summary>
         public static double PredictedMaxQ(Vessel v, double seconds)
         {
+            double step = PhysicsPolicy.PredictionStep(seconds);
             var b = v.mainBody;
             if (!b.atmosphere || v.LandedOrSplashed || v.orbit == null) return 0;
 
             double ut = Planetarium.GetUniversalTime();
             double max = 0;
-            for (double t = PredictionStepSeconds; t <= seconds + 1e-6; t += PredictionStepSeconds)
+            for (double t = step; t <= seconds + 1e-6; t += step)
             {
                 Vector3d pos = v.orbit.getPositionAtUT(ut + t);
                 double alt = b.GetAltitude(pos);
