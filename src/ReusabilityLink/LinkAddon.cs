@@ -1,3 +1,4 @@
+using HarmonyLib;
 using ReusabilityLink.Core;
 using UnityEngine;
 
@@ -7,32 +8,46 @@ namespace ReusabilityLink
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class LinkAddon : MonoBehaviour
     {
+        const string HarmonyId = "reusabilitylink";
+
         public static LinkAddon Instance { get; private set; }
 
         public LinkSettings Settings { get; private set; }
         public TrackingService Tracking { get; private set; }
+        public RangeController Ranges { get; private set; }
+
+        Harmony harmony;
+        WarpGuard warpGuard;
 
         void Awake()
         {
             Instance = this;
+            harmony = new Harmony(HarmonyId);
+            harmony.PatchAll(typeof(LinkAddon).Assembly);
         }
 
         void Start()
         {
             Settings = SettingsLoader.Load();
             Tracking = new TrackingService(Settings);
+            Ranges = new RangeController(Settings, Tracking);
+            warpGuard = new WarpGuard(Tracking, Ranges);
             Log.Info($"v1 cargado: MaxPhysicsDistance={Settings.MaxPhysicsDistance} SwitchKey={Settings.SwitchKey}");
         }
 
         void FixedUpdate()
         {
             if (Tracking == null || !FlightGlobals.ready) return;
-            Tracking.FixedTick(TimeWarp.fixedDeltaTime);
+            double dt = TimeWarp.fixedDeltaTime;
+            Tracking.FixedTick(dt);
+            Ranges.FixedTick(dt);
+            warpGuard.Tick();
         }
 
         void OnDestroy()
         {
             Tracking?.Dispose();
+            harmony?.UnpatchAll(HarmonyId);
             if (Instance == this) Instance = null;
         }
     }
