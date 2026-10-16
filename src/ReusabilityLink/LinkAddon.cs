@@ -10,6 +10,7 @@ namespace ReusabilityLink
         public static LinkAddon Instance { get; private set; }
 
         public LinkSettings Settings { get; private set; }
+        public TrackingService Tracking { get; private set; }
 
         void Awake()
         {
@@ -19,11 +20,19 @@ namespace ReusabilityLink
         void Start()
         {
             Settings = SettingsLoader.Load();
+            Tracking = new TrackingService(Settings);
             Log.Info($"v1 cargado: MaxPhysicsDistance={Settings.MaxPhysicsDistance} SwitchKey={Settings.SwitchKey}");
+        }
+
+        void FixedUpdate()
+        {
+            if (Tracking == null || !FlightGlobals.ready) return;
+            Tracking.FixedTick(TimeWarp.fixedDeltaTime);
         }
 
         void OnDestroy()
         {
+            Tracking?.Dispose();
             if (Instance == this) Instance = null;
         }
     }
