@@ -11,16 +11,17 @@ namespace RLProbe
     {
         public static readonly HashSet<Guid> Protected = new HashSet<Guid>();
 
+        // __state: whether this patch raised the flag; only then does it lower it again,
+        // so it composes with other patches doing the same (Harmony runs finalizers in prefix order).
         static void Prefix(Vessel __instance, out bool __state)
         {
-            __state = FlightGlobals.overrideOrbit;
-            if (Protected.Contains(__instance.id))
-                FlightGlobals.overrideOrbit = true;
+            __state = Protected.Contains(__instance.id) && !FlightGlobals.overrideOrbit;
+            if (__state) FlightGlobals.overrideOrbit = true;
         }
 
         static void Finalizer(bool __state)
         {
-            FlightGlobals.overrideOrbit = __state;
+            if (__state) FlightGlobals.overrideOrbit = false;
         }
     }
 }

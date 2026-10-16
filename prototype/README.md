@@ -4,6 +4,7 @@ Herramienta **desechable** para medir en tu KSP los riesgos que quedan antes de 
 
 ## Preparación
 
+0. **Instala solo uno de los dos a la vez.** Durante esta sesión saca la carpeta `GameData\ReusabilityLink` fuera de `GameData` (por ejemplo, al escritorio). Si no, el mod seguiría al booster y sobrescribiría los botones FÍSICA/RAÍLES de RLProbe en cada fotograma, y las mediciones no valdrían. Al terminar, borra `GameData\RLProbe` y vuelve a poner `GameData\ReusabilityLink`.
 1. Compila (con KSP cerrado): `dotnet build prototype/RLProbe/RLProbe.csproj -c Release`. Se instala solo en `GameData\RLProbe\Plugins\RLProbe.dll`.
 2. Construye un cohete de prueba: **etapa superior** con sonda + **booster** con sonda, motores y algo de combustible sobrante, más aletas o frenos aerodinámicos si sueles usarlos.
 3. En vuelo, `Alt+P` muestra/oculta la ventana de RLProbe. Lista las naves cargadas que no son la activa, con distancia, situación, `packed` (sobre raíles), presión estática, presión dinámica `q` y *jitter* (cuánto se deforma la nave respecto a su forma inicial; valores de milímetros son normales, de decímetros o más indican problema).
@@ -42,9 +43,9 @@ Deja el booster en **FÍSICA** y que toque **tierra** estando tú a más de 50 k
 
 Antes de cambiar a la etapa superior, activa el SAS del booster (en modo estabilidad o retrógrado). Ya en la etapa superior, observa en la ventana (o volviendo a él) si mantuvo la orientación mientras estaba inactivo.
 
-### 6. Tecla Alt+B
+### 6. Tecla Alt+Y
 
-En vuelo pulsa `Alt+B`. RLProbe muestra "Alt+B detectado". ¿Reacciona además KSP o algún otro mod (se abre algo, cambia algo)?
+En vuelo pulsa `Alt+Y` (la tecla por defecto del mod). RLProbe muestra "Alt+Y detectado". ¿Reacciona además KSP o algún otro mod (se abre algo, se activa un grupo de acción como los frenos o las luces)?
 
 ## Al terminar
 

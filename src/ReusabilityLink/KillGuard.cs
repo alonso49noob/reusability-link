@@ -1,4 +1,5 @@
 using HarmonyLib;
+using ReusabilityLink.Core;
 
 namespace ReusabilityLink
 {
@@ -19,16 +20,15 @@ namespace ReusabilityLink
     [HarmonyPatch(typeof(Vessel), nameof(Vessel.CheckKill))]
     internal static class KillGuardPatch
     {
+        // __state: whether this patch raised the flag. Other mods may patch CheckKill the same way.
         static void Prefix(Vessel __instance, out bool __state)
         {
-            __state = FlightGlobals.overrideOrbit;
-            if (KillGuard.IsProtected(__instance))
-                FlightGlobals.overrideOrbit = true;
+            __state = FlagGuard.Enter(ref FlightGlobals.overrideOrbit, KillGuard.IsProtected(__instance));
         }
 
         static void Finalizer(bool __state)
         {
-            FlightGlobals.overrideOrbit = __state;
+            FlagGuard.Exit(ref FlightGlobals.overrideOrbit, __state);
         }
     }
 }
