@@ -12,6 +12,8 @@ namespace ReusabilityLink
         readonly Dictionary<Guid, LandingSettle> settles = new Dictionary<Guid, LandingSettle>();
         // New vessels get their VesselModules during creation, so tracking is applied on the next tick.
         readonly List<Vessel> pendingAutoTrack = new List<Vessel>();
+        // Vessels the user tracked by hand: kept even while alone, until a pair forms. Session only.
+        readonly HashSet<Guid> manualPins = new HashSet<Guid>();
 
         public event Action<Vessel> TrackingStarted;
         public event Action<Vessel> TrackingEnded;
@@ -78,6 +80,7 @@ namespace ReusabilityLink
             module.SaveOriginalRanges();
             module.tracked = true;
             tracked.Add(v);
+            if (manual) manualPins.Add(v.id);
             settles[v.id] = new LandingSettle();
             Log.Info($"siguiendo {v.vesselName} ({(manual ? "manual" : "automático")})");
             TrackingStarted?.Invoke(v);
@@ -88,6 +91,7 @@ namespace ReusabilityLink
         {
             if (!tracked.Remove(v)) return;
             settles.Remove(v.id);
+            manualPins.Remove(v.id);
             var module = KspAdapters.Module(v);
             if (module != null)
             {
@@ -96,11 +100,6 @@ namespace ReusabilityLink
             }
             Log.Info($"deja de seguirse {v.vesselName}: {reason}");
             TrackingEnded?.Invoke(v);
-
-            // A link needs a pair: a lone active vessel is not worth tracking.
-            Prune();
-            if (tracked.Count == 1 && tracked[0] == FlightGlobals.ActiveVessel)
-                Untrack(tracked[0], "sin pareja");
         }
 
         public void FixedTick(double dt)
@@ -121,6 +120,28 @@ namespace ReusabilityLink
                     Untrack(v, "aterrizado");
                 }
             }
+
+            EnforcePairRule();
+        }
+
+        /// <summary>
+        /// Runs every tick so a vessel left alone (partner landed, lost, docked, or a leftover from an
+        /// earlier flight after loading) never blocks the next link.
+        /// </summary>
+        void EnforcePairRule()
+        {
+            var live = Tracked;
+            if (live.Count != 1)
+            {
+                if (live.Count > 1) manualPins.Clear();
+                return;
+            }
+
+            var v = live[0];
+            double atmosphereDepth = v.mainBody.atmosphere ? v.mainBody.atmosphereDepth : 0;
+            bool safe = PairRule.IsSafeAlone(KspAdapters.ToSituation(v.situation), v.orbit.PeA, atmosphereDepth);
+            if (PairRule.ShouldRelease(1, v == FlightGlobals.ActiveVessel, safe, manualPins.Contains(v.id)))
+                Untrack(v, "sin pareja");
         }
 
         void TrackPair(Vessel candidate)
