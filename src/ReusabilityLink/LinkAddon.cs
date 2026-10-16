@@ -15,6 +15,7 @@ namespace ReusabilityLink
         public LinkSettings Settings { get; private set; }
         public TrackingService Tracking { get; private set; }
         public RangeController Ranges { get; private set; }
+        public SwitchController Switcher { get; private set; }
 
         Harmony harmony;
         WarpGuard warpGuard;
@@ -32,7 +33,13 @@ namespace ReusabilityLink
             Tracking = new TrackingService(Settings);
             Ranges = new RangeController(Settings, Tracking);
             warpGuard = new WarpGuard(Tracking, Ranges);
+            Switcher = new SwitchController(Settings, Tracking);
             Log.Info($"v1 cargado: MaxPhysicsDistance={Settings.MaxPhysicsDistance} SwitchKey={Settings.SwitchKey}");
+        }
+
+        void Update()
+        {
+            Switcher?.Update();
         }
 
         void FixedUpdate()
