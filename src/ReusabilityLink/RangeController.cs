@@ -13,6 +13,7 @@ namespace ReusabilityLink
     {
         readonly LinkSettings settings;
         readonly TrackingService tracking;
+        readonly ThrottleMemory throttles;
         readonly Dictionary<Guid, PolicyState> states = new Dictionary<Guid, PolicyState>();
         double lastUT = double.NaN;
         double lookaheadSeconds;
@@ -20,10 +21,11 @@ namespace ReusabilityLink
         /// <summary>Fired with (vessel, previous mode, new mode).</summary>
         public event Action<Vessel, LinkMode, LinkMode> ModeChanged;
 
-        public RangeController(LinkSettings settings, TrackingService tracking)
+        public RangeController(LinkSettings settings, TrackingService tracking, ThrottleMemory throttles)
         {
             this.settings = settings;
             this.tracking = tracking;
+            this.throttles = throttles;
         }
 
         public LinkMode ModeOf(Vessel v) =>
@@ -79,7 +81,9 @@ namespace ReusabilityLink
                 DynamicPressurePa = AtmosphereSampler.CurrentQ(v),
                 PredictedDynamicPressurePa = AtmosphereSampler.PredictedMaxQ(v, lookaheadSeconds),
                 StaticPressureKPa = AtmosphereSampler.StaticPressureKPa(v.mainBody, v.altitude),
-                EngineThrusting = KspAdapters.EngineThrusting(v),
+                // A vessel left burning must stay unpacked even while packing zeroed its thrust.
+                EngineThrusting = KspAdapters.EngineThrusting(v)
+                    || (throttles.Held(v.id) > 0f && KspAdapters.HasIgnitedEngine(v)),
                 LandedOrSplashed = v.LandedOrSplashed,
                 SurfaceSpeed = v.srfSpeed,
                 DistanceM = Distance(v, active),

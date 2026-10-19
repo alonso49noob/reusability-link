@@ -28,7 +28,7 @@ namespace RLProbe
         {
             harmony = new Harmony("rlprobe");
             harmony.PatchAll(typeof(ProbeAddon).Assembly);
-            Debug.Log("[RLProbe] loaded, Alt+P toggles the window");
+            Debug.Log("[RLProbe] loaded, Alt+F8 toggles the window");
         }
 
         void OnDestroy()
@@ -40,7 +40,7 @@ namespace RLProbe
         void Update()
         {
             bool alt = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
-            if (alt && Input.GetKeyDown(KeyCode.P)) visible = !visible;
+            if (alt && Input.GetKeyDown(KeyCode.F8)) visible = !visible;
             if (alt && Input.GetKeyDown(KeyCode.Y)) ScreenMessages.PostScreenMessage("[RLProbe] Alt+Y detectado", 2f);
 
             if (pendingSwitch != null)
@@ -100,7 +100,7 @@ namespace RLProbe
         void OnGUI()
         {
             if (!visible) return;
-            window = GUILayout.Window(GetInstanceID(), window, DrawWindow, "RLProbe — medición (Alt+P)");
+            window = GUILayout.Window(GetInstanceID(), window, DrawWindow, "RLProbe — medición (Alt+F8)");
         }
 
         void DrawWindow(int id)

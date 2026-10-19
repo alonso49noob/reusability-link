@@ -31,6 +31,8 @@ La compilación copia el mod a la instalación de KSP indicada en `Directory.Bui
 1. Construye el booster con un **núcleo de control** (sonda o cabina) y **motores**.
 2. Al separarlo durante el ascenso aparece "Reusability Link: siguiendo …". Cofias, adaptadores y satélites desplegados en órbita estable **no** se siguen.
 3. Sigue pilotando la etapa superior. La ventanita muestra el booster. Cuando avise de aire denso o del encendido de reentrada, pulsa `Alt+Y` o el botón **Cambiar**.
+**Acelerador:** cada nave conserva el suyo. La que dejas sigue quemando con el acelerador que tenía, y la que recibes recupera el que tenía cuando la dejaste (0 si nunca la has pilotado).
+
 4. Aterriza el booster. Cuando lleva 10 s quieto en tierra o agua, deja de seguirse y queda como una nave normal.
 
 El botón de la barra de aplicaciones muestra u oculta la ventana. Abriéndola desde ahí también puedes **seguir o dejar de seguir la nave activa a mano**, sin filtro. Como máximo se siguen 2 naves a la vez (configurable).

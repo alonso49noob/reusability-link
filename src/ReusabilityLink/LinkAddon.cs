@@ -17,6 +17,7 @@ namespace ReusabilityLink
         public RangeController Ranges { get; private set; }
         public SwitchController Switcher { get; private set; }
         public MonitorWindow Monitor { get; private set; }
+        public ThrottleHandoff Throttles { get; private set; }
 
         Harmony harmony;
         WarpGuard warpGuard;
@@ -32,7 +33,8 @@ namespace ReusabilityLink
         {
             Settings = SettingsLoader.Load();
             Tracking = new TrackingService(Settings);
-            Ranges = new RangeController(Settings, Tracking);
+            Throttles = new ThrottleHandoff(Tracking);
+            Ranges = new RangeController(Settings, Tracking, Throttles.Memory);
             warpGuard = new WarpGuard(Tracking, Ranges);
             Switcher = new SwitchController(Settings, Tracking);
             Monitor = new MonitorWindow(Settings, Tracking, Ranges, Switcher);
@@ -55,12 +57,14 @@ namespace ReusabilityLink
             double dt = TimeWarp.fixedDeltaTime;
             Tracking.FixedTick(dt);
             Ranges.FixedTick(dt);
+            Throttles.FixedTick();
             warpGuard.Tick();
         }
 
         void OnDestroy()
         {
             Monitor?.Dispose();
+            Throttles?.Dispose();
             Tracking?.Dispose();
             harmony?.UnpatchAll(HarmonyId);
             if (Instance == this) Instance = null;

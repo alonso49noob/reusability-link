@@ -7,7 +7,7 @@ Herramienta **desechable** para medir en tu KSP los riesgos que quedan antes de 
 0. **Instala solo uno de los dos a la vez.** Durante esta sesión saca la carpeta `GameData\ReusabilityLink` fuera de `GameData` (por ejemplo, al escritorio). Si no, el mod seguiría al booster y sobrescribiría los botones FÍSICA/RAÍLES de RLProbe en cada fotograma, y las mediciones no valdrían. Al terminar, borra `GameData\RLProbe` y vuelve a poner `GameData\ReusabilityLink`.
 1. Compila (con KSP cerrado): `dotnet build prototype/RLProbe/RLProbe.csproj -c Release`. Se instala solo en `GameData\RLProbe\Plugins\RLProbe.dll`.
 2. Construye un cohete de prueba: **etapa superior** con sonda + **booster** con sonda, motores y algo de combustible sobrante, más aletas o frenos aerodinámicos si sueles usarlos.
-3. En vuelo, `Alt+P` muestra/oculta la ventana de RLProbe. Lista las naves cargadas que no son la activa, con distancia, situación, `packed` (sobre raíles), presión estática, presión dinámica `q` y *jitter* (cuánto se deforma la nave respecto a su forma inicial; valores de milímetros son normales, de decímetros o más indican problema).
+3. En vuelo, `Alt+F8` muestra/oculta la ventana de RLProbe. Lista las naves cargadas que no son la activa, con distancia, situación, `packed` (sobre raíles), presión estática, presión dinámica `q` y *jitter* (cuánto se deforma la nave respecto a su forma inicial; valores de milímetros son normales, de decímetros o más indican problema).
 4. Botones de cada nave:
    - **Mantener cargada:** evita que KSP la descargue (hay que pulsarlo **antes de que se aleje 22 km**, justo tras separar). También activa una línea por segundo en `KSP.log`.
    - **FÍSICA / RAÍLES:** fuerza física completa o sobre raíles.

@@ -43,6 +43,15 @@ namespace ReusabilityLink
             return false;
         }
 
+        /// <summary>An engine is lit and has fuel, whatever the throttle (works for packed vessels too).</summary>
+        public static bool HasIgnitedEngine(Vessel v)
+        {
+            foreach (var part in v.parts)
+                foreach (var engine in part.FindModulesImplementing<ModuleEngines>())
+                    if (engine.EngineIgnited && !engine.flameout) return true;
+            return false;
+        }
+
         public static LinkVesselModule Module(Vessel v) =>
             v == null ? null : v.FindVesselModuleImplementing<LinkVesselModule>();
     }
